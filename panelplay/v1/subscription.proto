@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package panelplay.v1;
+
+option go_package = "github.com/MohammadNasrallahBlank/panelplay-proto/gen/panelplay/v1;panelplayv1";
+option java_package = "com.panelplay.proto.v1";
+option java_multiple_files = true;
+option java_outer_classname = "SubscriptionProto";
+
+enum SubscriptionTier {
+  FREE = 0;
+  CREATOR = 1;
+  STUDIO = 2;
+}
+
+service SubscriptionService {
+  rpc GetTier(UserRequest) returns (TierResponse);
+  rpc CreateCheckoutSession(CheckoutRequest) returns (CheckoutResponse);
+  rpc HandleStripeWebhook(StripeWebhookRequest) returns (StripeWebhookResponse);
+}
+
+message UserRequest {
+  string user_id = 1;
+}
+
+message TierResponse {
+  SubscriptionTier tier = 1;
+  bool can_access_cache = 2;   // true for CREATOR and STUDIO
+  int32 daily_byok_limit = 3;  // -1 = unlimited
+  int64 expires_at_unix = 4;   // 0 if FREE (no expiry concept)
+}
+
+message CheckoutRequest {
+  string user_id = 1;
+  SubscriptionTier target_tier = 2;
+  string success_url = 3;
+  string cancel_url = 4;
+}
+
+message CheckoutResponse {
+  string checkout_url = 1;
+  string session_id = 2;
+}
+
+message StripeWebhookRequest {
+  bytes payload = 1;
+  string stripe_signature = 2;
+}
+
+message StripeWebhookResponse {
+  bool processed = 1;
+}

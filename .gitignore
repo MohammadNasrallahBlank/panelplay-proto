@@ -1,0 +1,4 @@
+# Go
+/vendor/
+*.exe
+*.test

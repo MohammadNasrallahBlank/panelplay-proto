@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package panelplay.v1;
+
+option go_package = "github.com/MohammadNasrallahBlank/panelplay-proto/gen/panelplay/v1;panelplayv1";
+option java_package = "com.panelplay.proto.v1";
+option java_multiple_files = true;
+option java_outer_classname = "CharacterProto";
+
+service CharacterService {
+  rpc GetCharacters(TitleRequest) returns (CharacterListResponse);
+  rpc ExtractAndStore(ExtractRequest) returns (CharacterListResponse);
+}
+
+message TitleRequest {
+  string title_id = 1;
+}
+
+message ExtractRequest {
+  string title_id = 1;
+  repeated bytes panel_images = 2;
+}
+
+message Character {
+  string id = 1;
+  string title_id = 2;
+  string name = 3;                    // empty if unnamed/auto-detected
+  string style_prompt_fragment = 4;   // injected into every generation for this character
+  int64 created_at_unix = 5;
+  // NOTE: reference_image_url intentionally omitted — internal to backend only
+  // Android never receives raw character image URLs (legal protection)
+}
+
+message CharacterListResponse {
+  repeated Character characters = 1;
+  bool extraction_pending = 2;  // true = extraction queued but not yet complete
+}

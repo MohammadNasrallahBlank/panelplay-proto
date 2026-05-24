@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package panelplay.v1;
+
+option go_package = "github.com/MohammadNasrallahBlank/panelplay-proto/gen/panelplay/v1;panelplayv1";
+option java_package = "com.panelplay.proto.v1";
+option java_multiple_files = true;
+option java_outer_classname = "SceneCacheProto";
+
+service SceneCacheService {
+  rpc CheckCache(CacheKeyRequest) returns (CacheCheckResponse);
+  rpc StoreScene(StoreSceneRequest) returns (StoreSceneResponse);
+  rpc GetPlaybackToken(PlaybackTokenRequest) returns (PlaybackTokenResponse);
+}
+
+message CacheKeyRequest {
+  string title_id = 1;
+  string chapter_id = 2;
+  int32 panel_start = 3;
+  int32 panel_end = 4;
+  string style_version = 5;  // bump this when AI model changes to invalidate old cache
+}
+
+message CacheCheckResponse {
+  bool hit = 1;
+  string scene_id = 2;  // opaque ID, only populated when hit = true
+                        // NEVER a raw URL — client must call GetPlaybackToken
+}
+
+message StoreSceneRequest {
+  CacheKeyRequest cache_key = 1;
+  bytes video_data = 2;   // MP4 bytes of generated scene
+  string user_id = 3;     // who generated this (for attribution/rate limiting)
+}
+
+message StoreSceneResponse {
+  string scene_id = 1;
+}
+
+message PlaybackTokenRequest {
+  string scene_id = 1;
+  string user_id = 2;
+}
+
+message PlaybackTokenResponse {
+  string signed_url = 1;      // short-lived CloudFront signed URL (15 min TTL)
+  int64 expires_at_unix = 2;  // client MUST re-request before this time
+}
