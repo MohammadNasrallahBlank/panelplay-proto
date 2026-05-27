@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package panelplay.v1;
+
+option go_package = "github.com/MohammadNasrallahBlank/panelplay-proto/gen/panelplay/v1;panelplayv1";
+option java_package = "com.panelplay.proto.v1";
+option java_multiple_files = true;
+option java_outer_classname = "GenerationProto";
+
+service GenerationService {
+  // Streams progress events then a final complete/failure event.
+  rpc GenerateScene(GenerateSceneRequest) returns (stream GenerateEvent);
+}
+
+message GenerateSceneRequest {
+  string provider      = 1;
+  string image_url     = 2;
+  string prompt        = 3;
+  string title_id      = 4;
+  string chapter_id    = 5;
+  int32  panel_start   = 6;
+  int32  panel_end     = 7;
+  string style_version = 8;
+}
+
+message GenerateEvent {
+  oneof event {
+    GenerateProgress progress = 1;
+    GenerateComplete complete = 2;
+    GenerateFailure  failure  = 3;
+  }
+}
+
+message GenerateProgress { float fraction = 1; }
+message GenerateComplete { string scene_id = 1; string signed_url = 2; }
+message GenerateFailure  { string error    = 1; }
