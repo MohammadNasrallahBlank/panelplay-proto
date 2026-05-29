@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package panelplay.v1;
+
+option go_package = "github.com/MohammadNasrallahBlank/panelplay-proto/gen/panelplay/v1;panelplayv1";
+option java_package = "com.panelplay.proto.v1";
+option java_multiple_files = true;
+option java_outer_classname = "KeyVaultProto";
+
+service KeyVaultService {
+  // Authenticated — JWT required. Replaces all stored keys for this user.
+  rpc SaveKeys(SaveKeysRequest) returns (SaveKeysResponse);
+}
+
+message SaveKeysRequest {
+  string kling_access_key  = 1;
+  string kling_signing_key = 2;
+  string runway_api_key    = 3;
+}
+
+message SaveKeysResponse { bool success = 1; }
